@@ -50,8 +50,8 @@ public class Bootstrap {
                 s.predecessor = currentRing.get(predecessorIndex);
                 s.successor = currentRing.get(successorIndex);
 
-                System.out.println("predecessorIndex for peer " + s.joinRequesterIndex + ": " + s.predecessor);
-                System.out.println("successorIndex for peer " + s.joinRequesterIndex + ": " + s.successor);
+                //System.out.println("predecessorIndex for peer " + s.joinRequesterIndex + ": " + s.predecessor);
+                //System.out.println("successorIndex for peer " + s.joinRequesterIndex + ": " + s.successor);
 
                 if(s.predecessor != s.joinRequesterIndex) {
                     // Update predecessor's neighbors
@@ -79,7 +79,7 @@ public class Bootstrap {
         for(BootstrapConnection conn : connections) {
             //System.out.println("conn.talker.targetHostname: " + conn.talker.targetHostname);
             if(conn.talker.targetHostname.equals("n" + joinRequesterIndex)) {
-                System.out.println("Starting talker to " + conn.talker.targetHostname);
+                //System.out.println("Starting talker to " + conn.talker.targetHostname);
                 conn.talker.start();
                 conn.talker.sendJoinResponse = true;
             }

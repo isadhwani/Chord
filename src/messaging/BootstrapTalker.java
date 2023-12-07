@@ -46,10 +46,10 @@ public class BootstrapTalker extends Thread {
                     outputStream.flush();
                     sendJoinResponse = false;
                 }
-                if(updatePredecessorNeighbors) {
-                    String message = "{id: 0, message:UPDATE_PREDECESSOR_NEIGHBORS, previous: " + state.predecessorPrev + ", next: " + state.predecessorNext + "}";
 
-                    System.out.println("Sending UPDATE_PREDECESSOR_NEIGHBORS to " + targetHostname + ": " + message);
+                if(updatePredecessorNeighbors) {
+                    String message = "{id: 0, message:UPDATE_NEIGHBORS, previous: " + state.predecessorPrev + ", next: " + state.predecessorNext + "}";
+                    System.out.println("Sending UPDATE_NEIGHBORS to " + targetHostname + ": " + message);
                     byte[] messageBytes = message.getBytes();
                     outputStream.write(messageBytes);
                     outputStream.flush();
@@ -57,19 +57,15 @@ public class BootstrapTalker extends Thread {
                 }
 
                 if(updateSuccessorNeighbors) {
-                    String message = "{id: 0, message:UPDATE_SUCCESSOR_NEIGHBORS, previous: " + state.successorPrev + ", next: " + state.successorNext + "}";
-
-                    System.out.println("Sending UPDATE_SUCCESSOR_NEIGHBORS to " + targetHostname + ": " + message);
+                    String message = "{id: 0, message:UPDATE_NEIGHBORS, previous: " + state.successorPrev + ", next: " + state.successorNext + "}";
+                    System.out.println("Sending UPDATE_NEIGHBORS to " + targetHostname + ": " + message);
                     byte[] messageBytes = message.getBytes();
                     outputStream.write(messageBytes);
                     outputStream.flush();
                     updateSuccessorNeighbors = false;
                 }
 
-
-
                 sleep(1);
-
 
                 // Close the socket
                 socket.close();

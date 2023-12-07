@@ -75,8 +75,19 @@ public class TCPListener extends Thread {
                         state.successor = successor;
                         state.joinedRing = true;
                         state.updateRingConnections = true;
-                        System.out.println("Joined ring with predecessor: " + predecessor + " and successor: " + successor);
+                        System.out.println("Joined ring with neighbor: [" + predecessor + ", " + successor + "]");
+                    } else if (msgType.equals("UPDATE_NEIGHBORS")) {
+                        int previous = Integer.parseInt(decoded.get("previous"));
+                        int next = Integer.parseInt(decoded.get("next"));
+                        state.predecessor = previous;
+                        state.successor = next;
+                        state.updateRingConnections = true;
+                        System.out.println("Updated neighbors to " + previous + " and " + next);
+                    } else if (msgType.equals("PREPARE")) {
+
                     } else if (msgType.equals("PREPARE_ACK")) {
+
+                    } else if (msgType.equals("PREPARED_PROPOSAL")) {
 
                     } else if (msgType.equals("ACCEPT")) {
 

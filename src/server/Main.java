@@ -12,7 +12,7 @@ import java.util.Arrays;
 
 public class Main {
     public static void main(String[] args) {
-        System.out.println("CMD ARGS: " + Arrays.toString(args));
+        //System.out.println("CMD ARGS: " + Arrays.toString(args));
         int[] possiblePeerIds = {1, 5, 10, 50, 66, 100, 126};
 
         Utils u = new Utils();
@@ -90,7 +90,7 @@ public class Main {
                 updateConnections(state, myIndex, predecessorConn, successorConn, listeners, talkers);
                 // Send each neighbor a ping
                 if(!state.onlyPeer) {
-                    System.out.println("Sending pings to neighbors");
+                    //System.out.println("Sending pings to neighbors");
                     successorConn.talker.sendPing = true;
                     predecessorConn.talker.sendPing = true;
                 }
