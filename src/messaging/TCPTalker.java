@@ -3,6 +3,7 @@ package messaging;
 import javax.swing.*;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.ConnectException;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import models.StateValues;
@@ -28,13 +29,20 @@ public class TCPTalker extends Thread {
         this.targetHostname = targetHostname;
         this.port = port;
         this.myHostname = myHostname;
+
     }
 
 
+    boolean first = true;
     @Override
     public void run() {
+//        if(first) {
+//            System.out.println("Starting talker to " + targetHostname + " on port " + port);
+//        }
+
         while (true) {
             if(close) {
+                System.out.println("Closing tlaker to " + targetHostname + " on port " + port);
                 System.exit(0);
             }
             try {
@@ -66,13 +74,12 @@ public class TCPTalker extends Thread {
                 }
                 // Close the socket
                 socket.close();
-            } catch (UnknownHostException e) {
-                throw new RuntimeException(e);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
+            } catch(Exception e) {
+                System.out.println("Connection timed out");
+                System.exit(0);
             }
+
+
         }
     }
 

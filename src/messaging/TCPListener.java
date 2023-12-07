@@ -27,7 +27,7 @@ public class TCPListener extends Thread {
 
     @Override
     public void run() {
-//        System.out.println("Starting listener from " + targetHostname + " on port " + port);
+        //System.out.println("Starting listener from " + targetHostname + " on port " + port);
         try {
             ServerSocket serverSocket = new ServerSocket(port);
             //System.out.println("Server is listening on port " + port);
@@ -53,6 +53,7 @@ public class TCPListener extends Thread {
             String receivedMessages;
             while ((receivedMessages = reader.readLine()) != null) {
                 if(close) {
+                    System.out.println("closing listener on " + targetHostname + " on port " + port);
                     System.exit(0);
                 }
                 //System.out.println("Received from " + clientSocket.getInetAddress().getHostName() + ": " + receivedMessages);
@@ -75,14 +76,14 @@ public class TCPListener extends Thread {
                         state.successor = successor;
                         state.joinedRing = true;
                         state.updateRingConnections = true;
-                        System.out.println("Joined ring with neighbor: [" + predecessor + ", " + successor + "]");
+                        System.out.println("Joined ring with predecessor: " + predecessor + ", successor: " + successor );
                     } else if (msgType.equals("UPDATE_NEIGHBORS")) {
                         int previous = Integer.parseInt(decoded.get("previous"));
                         int next = Integer.parseInt(decoded.get("next"));
                         state.predecessor = previous;
                         state.successor = next;
                         state.updateRingConnections = true;
-                        System.out.println("Updated neighbors to " + previous + " and " + next);
+                        System.out.println("Updated ring with predecessor: " + previous + ", successor: " + next );
                     } else if (msgType.equals("PREPARE")) {
 
                     } else if (msgType.equals("PREPARE_ACK")) {

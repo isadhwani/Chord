@@ -90,9 +90,10 @@ public class Main {
                 updateConnections(state, myIndex, predecessorConn, successorConn, listeners, talkers);
                 // Send each neighbor a ping
                 if(!state.onlyPeer) {
+                    // Send pings to see if neihbors are properly connected
                     //System.out.println("Sending pings to neighbors");
-                    successorConn.talker.sendPing = true;
-                    predecessorConn.talker.sendPing = true;
+                    //successorConn.talker.sendPing = true;
+                    //predecessorConn.talker.sendPing = true;
                 }
                 state.updateRingConnections = false;
             }
@@ -106,26 +107,28 @@ public class Main {
                                          ArrayList<TCPListener> listeners, ArrayList<TCPTalker> talkers) {
         // Stop conns if needed
         if(predecessorConn.talker != null) {
-            predecessorConn.talker.close = true;
-            predecessorConn.listener.close = true;
+            //predecessorConn.talker.close = true;
+            // predecessorConn.listener.close = true;
         }
         if(successorConn.talker != null) {
-            successorConn.talker.close = true;
-            successorConn.listener.close = true;
+            //successorConn.talker.close = true;
+           // successorConn.listener.close = true;
         }
 
         if(state.predecessor == state.successor && state.successor == myPeerIndex) {
             // I am the only node in the ring
             state.onlyPeer = true;
+        } else {
+            state.onlyPeer = false;
         }
 
-        System.out.println("Looking for talkers to " + state.predecessor + " and " + state.successor);
+       // System.out.println("Looking for talkers to " + state.predecessor + " and " + state.successor);
 
         for(TCPListener l : listeners) {
-            if(l.targetHostname == "n" + state.predecessor) {
+            if(l.targetHostname.equals("n" + state.predecessor)) {
                 predecessorConn.listener = l;
             }
-            if(l.targetHostname == "n" + state.successor) {
+            if(l.targetHostname.equals("n" + state.successor)) {
                 successorConn.listener = l;
             }
         }
@@ -134,14 +137,16 @@ public class Main {
            // System.out.println("Comparing " + t.targetHostname + " to " +  "n" + state.predecessor);
             if(t.targetHostname.equals("n" + state.predecessor)) {
                 predecessorConn.talker = t;
-                System.out.println("Assigning predecespr talker to " + t.targetHostname);
-                t.start();
+                // System.out.println("Assigning predecespr talker to " + t.targetHostname);
+                if (!t.isAlive() && !t.close) {
+                    t.start();
+                }
             }
             if(t.targetHostname.equals("n" + state.successor)) {
-                System.out.println("Assigning successsor talker  to " + t.targetHostname);
+                //System.out.println("Assigning successsor talker  to " + t.targetHostname);
 
                 successorConn.talker = t;
-                if(!t.isAlive()) {
+                if(!t.isAlive() && !t.close) {
                     t.start();
                 }
             }

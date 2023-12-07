@@ -59,7 +59,7 @@ public class Bootstrap {
                     s.predecessorNext = currentRing.get((predecessorIndex + 1) % currentRing.size());
                     getTalker(connections, s.predecessor).updatePredecessorNeighbors = true;
                 }
-                if(s.predecessor != s.joinRequesterIndex) {
+                if(s.predecessor != s.joinRequesterIndex && s.successor != s.predecessor) {
                     // Update successor's neighbors
                     s.successorPrev = currentRing.get((successorIndex - 1 + currentRing.size()) % currentRing.size());
                     s.successorNext = currentRing.get((successorIndex + 1) % currentRing.size());
@@ -69,7 +69,7 @@ public class Bootstrap {
                 startTalker(connections, s.joinRequesterIndex);
                 s.receivedJoinRequest = false;
 
-                System.out.println("Current ring: " + currentRing);
+                System.out.println("CURRENT RING: " + currentRing);
             }
             u.sleep(1);
         }
@@ -80,7 +80,12 @@ public class Bootstrap {
             //System.out.println("conn.talker.targetHostname: " + conn.talker.targetHostname);
             if(conn.talker.targetHostname.equals("n" + joinRequesterIndex)) {
                 //System.out.println("Starting talker to " + conn.talker.targetHostname);
-                conn.talker.start();
+                if(!conn.talker.isAlive())
+                    try {
+                        conn.talker.start();
+                    } catch(IllegalThreadStateException e) {
+                        System.out.println("Talker already started");
+                    }
                 conn.talker.sendJoinResponse = true;
             }
         }
