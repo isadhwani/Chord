@@ -1,0 +1,26 @@
+FROM amazoncorretto:17
+
+WORKDIR /app/
+
+ADD src/messaging/TCPConnection.java /app/messaging/
+ADD src/messaging/TCPListener.java /app/messaging/
+ADD src/messaging/TCPTalker.java /app/messaging/
+
+ADD src/models/StateValues.java /app/models/
+
+ADD src/server/Main.java /app/server/
+ADD src/server/Utils.java /app/server/
+
+
+RUN javac /app/models/StateValues.java
+
+RUN javac /app/messaging/TCPTalker.java
+RUN javac /app/messaging/TCPListener.java
+RUN javac /app/messaging/TCPConnection.java
+
+RUN javac /app/server/Utils.java
+RUN javac /app/server/Main.java
+
+
+ENTRYPOINT ["java", "server/Main"]
+

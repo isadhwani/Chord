@@ -1,0 +1,24 @@
+FROM amazoncorretto:17
+
+WORKDIR /app/
+
+ADD src/messaging/BootstrapConnection.java /app/messaging/
+ADD src/messaging/BootstrapListener.java /app/messaging/
+ADD src/messaging/BootstrapTalker.java /app/messaging/
+
+ADD src/models/BootstrapState.java /app/models/
+
+ADD src/server/Bootstrap.java /app/server/
+ADD src/server/Utils.java /app/server/
+
+RUN javac /app/models/BootstrapState.java
+
+RUN javac /app/messaging/BootstrapTalker.java
+RUN javac /app/messaging/BootstrapListener.java
+RUN javac /app/messaging/BootstrapConnection.java
+
+RUN javac /app/server/Utils.java
+RUN javac /app/server/Bootstrap.java
+
+ENTRYPOINT ["java", "server/Bootstrap"]
+
