@@ -47,9 +47,25 @@ public class Bootstrap {
 
                 int predecessorIndex = (index - 1 + currentRing.size()) % currentRing.size();
                 int successorIndex = (index + 1) % currentRing.size();
-
                 s.predecessor = currentRing.get(predecessorIndex);
                 s.successor = currentRing.get(successorIndex);
+
+                System.out.println("predecessorIndex for peer " + s.joinRequesterIndex + ": " + s.predecessor);
+                System.out.println("successorIndex for peer " + s.joinRequesterIndex + ": " + s.successor);
+
+                if(s.predecessor != s.joinRequesterIndex) {
+                    // Update predecessor's neighbors
+                    s.predecessorPrev = currentRing.get((predecessorIndex - 1 + currentRing.size()) % currentRing.size());
+                    s.predecessorNext = currentRing.get((predecessorIndex + 1) % currentRing.size());
+                    getTalker(connections, s.predecessor).updatePredecessorNeighbors = true;
+                }
+                if(s.predecessor != s.joinRequesterIndex) {
+                    // Update successor's neighbors
+                    s.successorPrev = currentRing.get((successorIndex - 1 + currentRing.size()) % currentRing.size());
+                    s.successorNext = currentRing.get((successorIndex + 1) % currentRing.size());
+                    getTalker(connections, s.successor).updateSuccessorNeighbors = true;
+                }
+
                 startTalker(connections, s.joinRequesterIndex);
                 s.receivedJoinRequest = false;
 
@@ -68,6 +84,16 @@ public class Bootstrap {
                 conn.talker.sendJoinResponse = true;
             }
         }
+    }
+
+    public static BootstrapTalker getTalker(List<BootstrapConnection> connections, int targetID) {
+        for(BootstrapConnection conn : connections) {
+            //System.out.println("conn.talker.targetHostname: " + conn.talker.targetHostname);
+            if(conn.talker.targetHostname.equals("n" + targetID)) {
+                return conn.talker;
+            }
+        }
+        throw new IllegalStateException("No talker found for " + targetID);
     }
 
 }

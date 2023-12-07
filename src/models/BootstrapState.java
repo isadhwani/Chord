@@ -10,6 +10,12 @@ public class BootstrapState {
     public int predecessor;
     public int successor;
 
+    public int predecessorPrev;
+    public int predecessorNext;
+
+    public int successorPrev;
+    public int successorNext;
+
     public boolean getReceivedJoinRequest() {
         try {
             mutex.acquire();

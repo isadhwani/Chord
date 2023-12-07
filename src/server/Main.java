@@ -58,6 +58,14 @@ public class Main {
             listen.start();
         }
 
+        ArrayList<TCPTalker> talkers = new ArrayList<>();
+        for(int i : possiblePeerIds) {
+            int newTalkerPort = myIndex * 10 + Utils.START_PORT + i;
+            TCPTalker talk = new TCPTalker(state, "n" + i, myHostname, newTalkerPort);
+            talkers.add(talk);
+            //talk.start();
+        }
+
 
         TCPTalker predecessorTalk = null;
         TCPListener predecessorListen = null;
@@ -79,11 +87,14 @@ public class Main {
                 state.joinedRing = true;
             }
             if(state.updateRingConnections) {
-                updateConnections(state, myIndex, predecessorConn, successorConn);
+                updateConnections(state, myIndex, predecessorConn, successorConn, listeners, talkers);
                 // Send each neighbor a ping
-                System.out.println("Sending pings to neighbors");
-                successorConn.talker.sendPing = true;
-                predecessorConn.talker.sendPing = true;
+                if(!state.onlyPeer) {
+                    System.out.println("Sending pings to neighbors");
+                    successorConn.talker.sendPing = true;
+                    predecessorConn.talker.sendPing = true;
+                }
+                state.updateRingConnections = false;
             }
 
             u.sleep(1);
@@ -91,7 +102,8 @@ public class Main {
     }
 
     public static void updateConnections(StateValues state, int myPeerIndex,
-                                         TCPConnection predecessorConn, TCPConnection successorConn) {
+                                         TCPConnection predecessorConn, TCPConnection successorConn,
+                                         ArrayList<TCPListener> listeners, ArrayList<TCPTalker> talkers) {
         // Stop conns if needed
         if(predecessorConn.talker != null) {
             predecessorConn.talker.close = true;
@@ -102,36 +114,39 @@ public class Main {
             successorConn.listener.close = true;
         }
 
-        // Start new connections
-        int talkerPortPredecessor = myPeerIndex * 10 + Utils.START_PORT + state.predecessor;
-        int listenPortPredecessor = state.predecessor * 10 + Utils.START_PORT + myPeerIndex;
-
-        int talkerPortSuccessor = myPeerIndex * 10 + Utils.START_PORT + state.successor;
-        int listenPortSuccessor = state.successor * 10 + Utils.START_PORT + myPeerIndex;
-
-        TCPListener predecessorListen = new TCPListener(state, "n" + myPeerIndex, "n" + state.predecessor, listenPortPredecessor);
-        TCPTalker predecessorTalk = new TCPTalker(state, "n" + state.predecessor, "n" + myPeerIndex, talkerPortPredecessor);
-        predecessorConn = new TCPConnection(predecessorTalk, predecessorListen);
-
-        if(state.predecessor != state.successor && state.predecessor != myPeerIndex) {
-
-
+        if(state.predecessor == state.successor && state.successor == myPeerIndex) {
+            // I am the only node in the ring
+            state.onlyPeer = true;
         }
-        TCPListener successorListen = new TCPListener(state, "n" + myPeerIndex, "n" + state.successor, listenPortSuccessor);
-        TCPTalker successorTalk = new TCPTalker(state, "n" + state.successor, "n" + myPeerIndex, talkerPortSuccessor);
-        successorConn = new TCPConnection(successorTalk, successorListen);
 
-        System.out.println("Starting talker from " + myPeerIndex + " to " + state.predecessor + " on port " + talkerPortPredecessor);
-        System.out.println("Starting listener from " + state.predecessor + " on port " + listenPortPredecessor);
+        System.out.println("Looking for talkers to " + state.predecessor + " and " + state.successor);
 
-        System.out.println("Starting talker from " + myPeerIndex + " to " + state.successor + " on port " + talkerPortSuccessor);
-        System.out.println("Starting listener from " + state.successor + " on port " + listenPortSuccessor);
+        for(TCPListener l : listeners) {
+            if(l.targetHostname == "n" + state.predecessor) {
+                predecessorConn.listener = l;
+            }
+            if(l.targetHostname == "n" + state.successor) {
+                successorConn.listener = l;
+            }
+        }
 
-        predecessorConn.listener.start();
-        successorConn.listener.start();
+        for(TCPTalker t : talkers) {
+           // System.out.println("Comparing " + t.targetHostname + " to " +  "n" + state.predecessor);
+            if(t.targetHostname.equals("n" + state.predecessor)) {
+                predecessorConn.talker = t;
+                System.out.println("Assigning predecespr talker to " + t.targetHostname);
+                t.start();
+            }
+            if(t.targetHostname.equals("n" + state.successor)) {
+                System.out.println("Assigning successsor talker  to " + t.targetHostname);
 
-        successorConn.talker.start();
-        predecessorConn.talker.start();
+                successorConn.talker = t;
+                if(!t.isAlive()) {
+                    t.start();
+                }
+            }
+        }
+
     }
 
 

@@ -12,7 +12,7 @@ import java.util.*;
 public class TCPListener extends Thread {
     StateValues state;
     String myHostname;
-    String targetHostname;
+    public String targetHostname;
     int port;
 
     public boolean close = false;

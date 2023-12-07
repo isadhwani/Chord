@@ -57,7 +57,7 @@ public class TCPTalker extends Thread {
                 if(sendPing) {
                 	String message = "{id: " + state.id + ", message:PING, hostname: " + myHostname + "}";
 
-                    System.out.println("Sending PING to server: " + message);
+                    System.out.println("Sending PING to " + targetHostname + ": " + message);
                     byte[] messageBytes = message.getBytes();
                     outputStream.write(messageBytes);
                     outputStream.flush();

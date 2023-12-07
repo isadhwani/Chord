@@ -16,6 +16,10 @@ public class BootstrapTalker extends Thread {
 
     public boolean sendJoinResponse = false;
 
+    public boolean updatePredecessorNeighbors = false;
+
+    public boolean updateSuccessorNeighbors = false;
+
 
     public BootstrapTalker(BootstrapState s, String targetHostname, String myHostname, int port) {
         this.state = s;
@@ -41,6 +45,25 @@ public class BootstrapTalker extends Thread {
                     outputStream.write(messageBytes);
                     outputStream.flush();
                     sendJoinResponse = false;
+                }
+                if(updatePredecessorNeighbors) {
+                    String message = "{id: 0, message:UPDATE_PREDECESSOR_NEIGHBORS, previous: " + state.predecessorPrev + ", next: " + state.predecessorNext + "}";
+
+                    System.out.println("Sending UPDATE_PREDECESSOR_NEIGHBORS to " + targetHostname + ": " + message);
+                    byte[] messageBytes = message.getBytes();
+                    outputStream.write(messageBytes);
+                    outputStream.flush();
+                    updatePredecessorNeighbors = false;
+                }
+
+                if(updateSuccessorNeighbors) {
+                    String message = "{id: 0, message:UPDATE_SUCCESSOR_NEIGHBORS, previous: " + state.successorPrev + ", next: " + state.successorNext + "}";
+
+                    System.out.println("Sending UPDATE_SUCCESSOR_NEIGHBORS to " + targetHostname + ": " + message);
+                    byte[] messageBytes = message.getBytes();
+                    outputStream.write(messageBytes);
+                    outputStream.flush();
+                    updateSuccessorNeighbors = false;
                 }
 
 

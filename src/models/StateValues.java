@@ -9,6 +9,8 @@ public class StateValues {
     public int predecessor = -1;
     public int successor = -1;
 
+    public boolean onlyPeer = false;
+
     public boolean updateRingConnections = false;
     private Semaphore mutex = new Semaphore(1);
 
