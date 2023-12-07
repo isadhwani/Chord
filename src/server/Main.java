@@ -98,6 +98,20 @@ public class Main {
                 state.updateRingConnections = false;
             }
 
+            if(state.storeData) {
+                System.out.println("Storing data with object ID" + state.objectIDToStore + " and client ID " + state.clientToStoreAt);
+                state.storeData = false;
+                // Do some stuff...
+            } else if(state.forwardMessage) {
+                System.out.println("Forwarding message: " + state.messageToForward);
+                state.forwardMessage = false;
+                successorConn.talker.forwardMessage = true;
+                // Do some stuff...
+
+            }
+
+
+
             u.sleep(1);
         }
     }

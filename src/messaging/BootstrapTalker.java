@@ -20,6 +20,9 @@ public class BootstrapTalker extends Thread {
 
     public boolean updateSuccessorNeighbors = false;
 
+    public boolean sendStoreRequest = false;
+
+
 
     public BootstrapTalker(BootstrapState s, String targetHostname, String myHostname, int port) {
         this.state = s;
@@ -37,7 +40,6 @@ public class BootstrapTalker extends Thread {
                 OutputStream outputStream = socket.getOutputStream();
 
                 if (sendJoinResponse) {
-
                     String message = "{id: 0, message:JOIN_RESPONSE, predecessor: " + state.predecessor + ", successor: " + state.successor + "}";
 
                     System.out.println("Sending JOIN_RESPONSE to server: " + message);
@@ -65,16 +67,22 @@ public class BootstrapTalker extends Thread {
                     updateSuccessorNeighbors = false;
                 }
 
+                if(sendStoreRequest) {
+                    String message = state.clientRequest;
+                    System.out.println("Sending STORE_REQUEST to " + targetHostname + ": " + message);
+                    byte[] messageBytes = message.getBytes();
+                    outputStream.write(messageBytes);
+                    outputStream.flush();
+                    sendStoreRequest = false;
+                }
+
                 sleep(1);
 
                 // Close the socket
                 socket.close();
-            } catch (UnknownHostException e) {
-                throw new RuntimeException(e);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
+            } catch (Exception e) {
+                System.out.println("Exception in BootstrapTalker: " + e.getMessage());
+                System.exit(0);
             }
         }
     }

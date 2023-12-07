@@ -12,6 +12,11 @@ public class StateValues {
     public boolean onlyPeer = false;
 
     public boolean updateRingConnections = false;
+    public int objectIDToStore;
+    public boolean storeData = false;
+    public int clientToStoreAt;
+    public String messageToForward;
+    public boolean forwardMessage = false;
     private Semaphore mutex = new Semaphore(1);
 
 

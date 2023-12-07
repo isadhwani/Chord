@@ -35,6 +35,11 @@ public class Bootstrap {
             connections.add(conn);
         }
 
+        BootstrapListener clientListen = new BootstrapListener(s, myHostname, "client", Utils.CLIENT_TALK_PORT);
+        BootstrapTalker clientTalker = new BootstrapTalker(s, "client", myHostname, Utils.CLIENT_LISTEN_PORT);
+
+        clientListen.start();
+
         while(true) {
 
             if(s.receivedJoinRequest) {
@@ -70,6 +75,12 @@ public class Bootstrap {
                 s.receivedJoinRequest = false;
 
                 System.out.println("CURRENT RING: " + currentRing);
+            } if(s.receivedStoreRequest) {
+                //clientTalker.start();
+                // Always send store request to first peer. This peer will always be n1
+                connections.get(0).talker.sendStoreRequest = true;
+                s.receivedStoreRequest = false;
+
             }
             u.sleep(1);
         }

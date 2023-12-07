@@ -1,0 +1,24 @@
+FROM amazoncorretto:17
+
+WORKDIR /app/
+
+ADD src/messaging/ClientListener.java /app/messaging/
+ADD src/messaging/ClientTalker.java /app/messaging/
+
+ADD src/models/ClientState.java /app/models/
+
+ADD src/client/Client.java /app/client/
+ADD src/server/Utils.java /app/server/
+
+
+RUN javac /app/models/ClientState.java
+
+RUN javac /app/messaging/ClientListener.java
+RUN javac /app/messaging/ClientTalker.java
+
+RUN javac /app/server/Utils.java
+RUN javac /app/client/Client.java
+
+
+ENTRYPOINT ["java", "client/Client"]
+

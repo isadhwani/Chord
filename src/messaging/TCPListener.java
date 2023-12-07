@@ -84,17 +84,18 @@ public class TCPListener extends Thread {
                         state.successor = next;
                         state.updateRingConnections = true;
                         System.out.println("Updated ring with predecessor: " + previous + ", successor: " + next );
-                    } else if (msgType.equals("PREPARE")) {
+                    } else if (msgType.equals("client")) {
+                        if(decoded.get("operationType").equals("STORE")) {
+                            if(Integer.parseInt(decoded.get("clientID")) <= state.id) {
+                                state.objectIDToStore = Integer.parseInt(decoded.get("objectID"));
+                                state.clientToStoreAt = Integer.parseInt(decoded.get("clientID"));
+                                state.storeData = true;
+                            } else {
+                                state.messageToForward = message;
+                                state.forwardMessage = true;
 
-                    } else if (msgType.equals("PREPARE_ACK")) {
-
-                    } else if (msgType.equals("PREPARED_PROPOSAL")) {
-
-                    } else if (msgType.equals("ACCEPT")) {
-
-                    } else if(msgType.equals("ACCEPT_ACK")) {
-
-                    } else if(msgType.equals("ACCEPTED_PROPOSAL")) {
+                            }
+                        }
 
                     }
 

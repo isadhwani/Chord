@@ -22,6 +22,8 @@ public class TCPTalker extends Thread {
 
     public boolean sendPing = false;
 
+    public boolean forwardMessage = false;
+
 
 
     public TCPTalker(StateValues s, String targetHostname, String myHostname, int port) {
@@ -71,6 +73,17 @@ public class TCPTalker extends Thread {
                     outputStream.flush();
                     sendPing = false;
                     sleep(1);
+                }
+
+                if(forwardMessage) {
+                    String message = state.messageToForward;
+
+                        System.out.println("Forwarding message to " + targetHostname + ": " + message);
+                        byte[] messageBytes = message.getBytes();
+                        outputStream.write(messageBytes);
+                        outputStream.flush();
+                        forwardMessage = false;
+                        sleep(1);
                 }
                 // Close the socket
                 socket.close();

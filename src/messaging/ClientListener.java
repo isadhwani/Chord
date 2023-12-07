@@ -1,6 +1,6 @@
 package messaging;
 
-import models.BootstrapState;
+import models.ClientState;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -9,14 +9,16 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.*;
 
-public class BootstrapListener extends Thread {
-    BootstrapState state;
+public class ClientListener extends Thread {
+    ClientState state;
     String myHostname;
-    String targetHostname;
+    public String targetHostname;
     int port;
 
+    public boolean close = false;
 
-    public BootstrapListener(BootstrapState s, String myHostname, String targetHostname, int port) {
+
+    public ClientListener(ClientState s, String myHostname, String targetHostname, int port) {
         this.port = port;
         this.myHostname = myHostname;
         this.state = s;
@@ -25,7 +27,7 @@ public class BootstrapListener extends Thread {
 
     @Override
     public void run() {
-//        System.out.println("Starting listener from " + targetHostname + " on port " + port);
+        //System.out.println("Starting listener from " + targetHostname + " on port " + port);
         try {
             ServerSocket serverSocket = new ServerSocket(port);
             //System.out.println("Server is listening on port " + port);
@@ -50,6 +52,10 @@ public class BootstrapListener extends Thread {
 
             String receivedMessages;
             while ((receivedMessages = reader.readLine()) != null) {
+                if(close) {
+                    System.out.println("closing listener on " + targetHostname + " on port " + port);
+                    System.exit(0);
+                }
                 //System.out.println("Received from " + clientSocket.getInetAddress().getHostName() + ": " + receivedMessages);
                 System.out.println("Received: " + receivedMessages);
 
@@ -62,24 +68,18 @@ public class BootstrapListener extends Thread {
 
                     String msgType = decoded.get("message");
 
-                    if (msgType.equals("JOIN_REQUEST")) {
-                       // System.out.println("Received join request from " + decoded.get("hostname"));
-                        state.receivedJoinRequest = true;
-                        state.joinRequesterIndex = Integer.parseInt(decoded.get("id"));
-                    } else if (decoded.get("operationType").equals("STORE")) {
-                        state.receivedStoreRequest = true;
-                        state.clientRequest = message;
+                    if (msgType.equals("JOIN_RESPONSE")) {
+
                     }
+
 
                 }
                 sleep(1);
             }
 
-        } catch (IOException e) {
-            System.out.println(e.getMessage());
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+        } catch (Exception e) {
+            System.out.println("Exception in ClientListener: " + e.getMessage());
+            System.exit(0);
         }
     }
 

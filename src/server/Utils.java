@@ -5,6 +5,8 @@ import java.util.regex.Pattern;
 
 public class Utils {
     static final int START_PORT = 5000;
+    public static final int CLIENT_LISTEN_PORT = 4000;
+    public static final int CLIENT_TALK_PORT = 4001;
     public static void sleep(int ms) {
         try {
             Thread.sleep(ms);
