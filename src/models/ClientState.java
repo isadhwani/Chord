@@ -7,4 +7,6 @@ public class ClientState {
     public int objectIDToStore;
 
     public int requestID = 0;
+    public int objectIDToRetrieve;
+    public int clientIDToRetrieve;
 }

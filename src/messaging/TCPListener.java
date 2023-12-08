@@ -86,14 +86,23 @@ public class TCPListener extends Thread {
                         System.out.println("Updated ring with predecessor: " + previous + ", successor: " + next );
                     } else if (msgType.equals("client")) {
                         if(decoded.get("operationType").equals("STORE")) {
-                            if(Integer.parseInt(decoded.get("clientID")) <= state.id) {
-                                state.objectIDToStore = Integer.parseInt(decoded.get("objectID"));
-                                state.clientToStoreAt = Integer.parseInt(decoded.get("clientID"));
+                            if(Integer.parseInt(decoded.get("objectID")) <= state.id) {
+                                state.objectID = Integer.parseInt(decoded.get("objectID"));
+                                state.clientID = Integer.parseInt(decoded.get("clientID"));
                                 state.storeData = true;
                             } else {
                                 state.messageToForward = message;
                                 state.forwardMessage = true;
 
+                            }
+                        } else if(decoded.get("operationType").equals("RETRIEVE")) {
+                            if(Integer.parseInt(decoded.get("objectID")) <= state.id) {
+                                state.objectID = Integer.parseInt(decoded.get("objectID"));
+                                state.clientID = Integer.parseInt(decoded.get("clientID"));
+                                state.lookupData = true;
+                            } else {
+                                state.messageToForward = message;
+                                state.forwardMessage = true;
                             }
                         }
 

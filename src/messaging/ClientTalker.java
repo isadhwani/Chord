@@ -17,6 +17,7 @@ public class ClientTalker extends Thread {
     String myHostname;
 
 
+    public boolean sendRetrieve = false;
 
 
     public ClientTalker(ClientState s, String targetHostname, String myHostname, int port) {
@@ -42,12 +43,21 @@ public class ClientTalker extends Thread {
                      * objectID, and clientID. reqID must be monotonically increasing per client, operationType is STORE
                      * or RETRIEVE, objectID and client ID are numbered from 1 to 127.
                      */
-                    String message = "{message:client, reqID:" + state.requestID + ", operationType: STORE, objectID: " + state.objectIDToStore + ", clientID: " + state.clientToStoreAt + "}";
+                    String message = "{message:client, reqID:" + ++state.requestID + ", operationType: STORE, objectID: " + state.objectIDToStore + ", clientID: " + state.clientToStoreAt + "}";
                     System.out.println("Sending STORE to " + targetHostname + ": " + message);
                     byte[] messageBytes = message.getBytes();
                     outputStream.write(messageBytes);
                     outputStream.flush();
                     sendStore = false;
+                }
+
+                if(sendRetrieve) {
+                    String message = "{message:client, reqID:" + ++state.requestID + ", operationType: RETRIEVE, objectID: " + state.objectIDToRetrieve + ", clientID: " + state.clientIDToRetrieve + "}";
+                    System.out.println("Sending RETRIEVE to " + targetHostname + ": " + message);
+                    byte[] messageBytes = message.getBytes();
+                    outputStream.write(messageBytes);
+                    outputStream.flush();
+                    sendRetrieve = false;
                 }
 
 
@@ -56,12 +66,9 @@ public class ClientTalker extends Thread {
 
                 // Close the socket
                 socket.close();
-            } catch (UnknownHostException e) {
-                throw new RuntimeException(e);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
+            } catch (Exception e) {
+                System.out.println("Connection timed out");
+                System.exit(0);
             }
         }
     }

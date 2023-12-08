@@ -1,18 +1,29 @@
 FROM amazoncorretto:17
 
 WORKDIR /app/
+ADD docker-compose-testcases-and-objects-lab5/objects1.txt /app/
+ADD docker-compose-testcases-and-objects-lab5/objects5.txt /app/
+ADD docker-compose-testcases-and-objects-lab5/objects10.txt /app/
+ADD docker-compose-testcases-and-objects-lab5/objects50.txt /app/
+ADD docker-compose-testcases-and-objects-lab5/objects66.txt /app/
+ADD docker-compose-testcases-and-objects-lab5/objects100.txt /app/
+ADD docker-compose-testcases-and-objects-lab5/objects126.txt /app/
+
 
 ADD src/messaging/TCPConnection.java /app/messaging/
 ADD src/messaging/TCPListener.java /app/messaging/
 ADD src/messaging/TCPTalker.java /app/messaging/
 
 ADD src/models/StateValues.java /app/models/
+ADD src/models/ObjectStored.java /app/models/
 
 ADD src/server/Main.java /app/server/
 ADD src/server/Utils.java /app/server/
 
 
 RUN javac /app/models/StateValues.java
+RUN javac /app/models/ObjectStored.java
+
 
 RUN javac /app/messaging/TCPTalker.java
 RUN javac /app/messaging/TCPListener.java

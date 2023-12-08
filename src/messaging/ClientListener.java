@@ -68,7 +68,19 @@ public class ClientListener extends Thread {
 
                     String msgType = decoded.get("message");
 
-                    if (msgType.equals("JOIN_RESPONSE")) {
+                    if (msgType.equals("service")) {
+                        switch (decoded.get("status")) {
+                            case "OBJ_STORED":
+                                System.out.println("STORED: " + decoded.get("objectID"));
+                                break;
+                            case "FOUND":
+                                System.out.println("RETRIEVED: " + decoded.get("objectID"));
+                                break;
+                            case "NOT_FOUND":
+                                System.out.println("NOT FOUND: " + decoded.get("objectID"));
+                                break;
+                        }
+
 
                     }
 

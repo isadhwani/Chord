@@ -52,6 +52,16 @@ public class Bootstrap {
 
                 int predecessorIndex = (index - 1 + currentRing.size()) % currentRing.size();
                 int successorIndex = (index + 1) % currentRing.size();
+                if(predecessorIndex < 0 || successorIndex < 0) {
+                    // TODO: Find what occasionally causes this
+                    System.out.println("Something has gone horribly wrong, please restart the whole program...");
+                    System.out.println("predecessorIndex: " + predecessorIndex);
+                    System.out.println("successorIndex: " + successorIndex);
+                    System.out.println("index: " + index);
+                    System.out.println("Join requester index: " + s.joinRequesterIndex);
+                    System.exit(0);
+                }
+
                 s.predecessor = currentRing.get(predecessorIndex);
                 s.successor = currentRing.get(successorIndex);
 
@@ -75,12 +85,16 @@ public class Bootstrap {
                 s.receivedJoinRequest = false;
 
                 System.out.println("CURRENT RING: " + currentRing);
-            } if(s.receivedStoreRequest) {
+            } if(s.receivedClientRequest) {
                 //clientTalker.start();
                 // Always send store request to first peer. This peer will always be n1
-                connections.get(0).talker.sendStoreRequest = true;
-                s.receivedStoreRequest = false;
+                connections.get(0).talker.forwardClientMessageToServer = true;
+                s.receivedClientRequest = false;
 
+            } else if(s.forwardToClient) {
+                clientTalker.start();
+                clientTalker.forwardServerMessageToClient = true;
+                s.forwardToClient = false;
             }
             u.sleep(1);
         }

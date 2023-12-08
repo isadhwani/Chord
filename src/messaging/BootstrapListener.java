@@ -66,9 +66,12 @@ public class BootstrapListener extends Thread {
                        // System.out.println("Received join request from " + decoded.get("hostname"));
                         state.receivedJoinRequest = true;
                         state.joinRequesterIndex = Integer.parseInt(decoded.get("id"));
-                    } else if (decoded.get("operationType").equals("STORE")) {
-                        state.receivedStoreRequest = true;
+                    } else if (msgType.equals("client") ) {//&& decoded.get("operationType").equals("STORE")) {
+                        state.receivedClientRequest = true;
                         state.clientRequest = message;
+                    } else if(msgType.equals("service")) {
+                        state.forwardToClient = true;
+                        state.messageToForward = message;
                     }
 
                 }

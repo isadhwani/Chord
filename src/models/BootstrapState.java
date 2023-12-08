@@ -3,8 +3,10 @@ package models;
 import java.util.concurrent.Semaphore;
 
 public class BootstrapState {
-    public boolean receivedStoreRequest = false;
+    public boolean receivedClientRequest = false;
     public String clientRequest;
+    public boolean forwardToClient = false;
+    public String messageToForward;
     private Semaphore mutex = new Semaphore(1);
     public boolean receivedJoinRequest = false;
     public int joinRequesterIndex;

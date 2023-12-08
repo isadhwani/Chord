@@ -1,14 +1,18 @@
 package server;
 
+import com.sun.jdi.ObjectReference;
 import messaging.TCPConnection;
 import messaging.TCPListener;
 import messaging.TCPTalker;
+import models.ObjectStored;
 import models.StateValues;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.*;
 
 public class Main {
     public static void main(String[] args) {
@@ -36,6 +40,8 @@ public class Main {
             }
         }
 
+
+        List<ObjectStored> objectStore = getObjectStore(objects);
         String myHostname = getMyHostname();
         StateValues state = new StateValues();
         int myIndex = Utils.extractNumberFromTarget(myHostname, "n");
@@ -99,20 +105,48 @@ public class Main {
             }
 
             if(state.storeData) {
-                System.out.println("Storing data with object ID" + state.objectIDToStore + " and client ID " + state.clientToStoreAt);
+                System.out.println("STORED " + state.objectID);// + " and client ID " + state.clientToStoreAt);
+                objectStore.add(new ObjectStored(state.objectID, state.clientID));
+                printObjectStore(objectStore);
+                bootstrapTalk.sendObjStored = true;
                 state.storeData = false;
                 // Do some stuff...
             } else if(state.forwardMessage) {
-                System.out.println("Forwarding message: " + state.messageToForward);
                 state.forwardMessage = false;
                 successorConn.talker.forwardMessage = true;
+            } else if(state.lookupData) {
+                System.out.println("LOOKUP objID:" + state.objectID + " clientID: " + state.clientID);
+                printObjectStore(objectStore);
+                boolean found = false;
+                for(ObjectStored obj : objectStore) {
+                    if(obj.clientID == state.clientID && obj.objectID == state.objectID) {
+                        System.out.println("FOUND " + obj.objectID);
+                        found = true;
+                        state.objectFound = obj.objectID;
+                        bootstrapTalk.sendFound = true;
+                        // send some shit back to bootstrap
+                    }
+                }
+                if(!found) {
+                    System.out.println("NOT FOUND");
+                    bootstrapTalk.sendNotFound = true;
+                }
+                state.lookupData = false;
                 // Do some stuff...
+
 
             }
 
 
 
             u.sleep(1);
+        }
+    }
+
+    public static void printObjectStore(List<ObjectStored> objs) {
+        System.out.println("Object store now contains:");
+        for (ObjectStored obj : objs) {
+            System.out.println("clientID: " + obj.clientID + ", objectID: " + obj.objectID);
         }
     }
 
@@ -165,7 +199,22 @@ public class Main {
                 }
             }
         }
+    }
 
+    public static List<ObjectStored> getObjectStore(String fileName) {
+        List<ObjectStored> objects = new ArrayList<>();
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(fileName));
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] split = line.split("::");
+                objects.add(new ObjectStored(Integer.parseInt(split[1]), Integer.parseInt(split[0])));
+
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return objects;
     }
 
 

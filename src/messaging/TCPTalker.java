@@ -12,6 +12,8 @@ public class TCPTalker extends Thread {
 
     public StateValues state;
     public String targetHostname;
+    public boolean sendFound = false;
+    public boolean sendNotFound = false;
     int port;
     String myHostname;
 
@@ -23,6 +25,7 @@ public class TCPTalker extends Thread {
     public boolean sendPing = false;
 
     public boolean forwardMessage = false;
+    public boolean sendObjStored = false;
 
 
 
@@ -83,6 +86,42 @@ public class TCPTalker extends Thread {
                         outputStream.write(messageBytes);
                         outputStream.flush();
                         forwardMessage = false;
+                        sleep(1);
+                }
+
+                if(sendObjStored) {
+                    String message = "{id: " + state.id + ", message:service, status:OBJ_STORED, hostname: " + myHostname + "" +
+                            ", objectID: " + state.objectID + ", clientID: " + state.clientID + "}";
+
+                        System.out.println("Sending OBJ_STORED to " + targetHostname + ": " + message);
+                        byte[] messageBytes = message.getBytes();
+                        outputStream.write(messageBytes);
+                        outputStream.flush();
+                        sendObjStored = false;
+                        sleep(1);
+                }
+
+                if(sendFound) {
+                    String message = "{id: " + state.id + ", message:service, status:FOUND, hostname: " + myHostname + "" +
+                            ", objectID: " + state.objectFound + "}";
+
+                        System.out.println("Sending FOUND to " + targetHostname + ": " + message);
+                        byte[] messageBytes = message.getBytes();
+                        outputStream.write(messageBytes);
+                        outputStream.flush();
+                        sendFound = false;
+                        sleep(1);
+                }
+
+                if(sendNotFound) {
+                    String message = "{id: " + state.id + ", message:service, status:NOT_FOUND, hostname: " + myHostname + "" +
+                            ", objectID: " + state.objectID + "}";
+
+                        System.out.println("Sending NOT_FOUND to " + targetHostname + ": " + message);
+                        byte[] messageBytes = message.getBytes();
+                        outputStream.write(messageBytes);
+                        outputStream.flush();
+                        sendNotFound = false;
                         sleep(1);
                 }
                 // Close the socket

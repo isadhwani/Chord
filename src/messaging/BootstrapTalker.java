@@ -1,14 +1,13 @@
 package messaging;
 
-import java.io.IOException;
 import java.io.OutputStream;
 import java.net.Socket;
-import java.net.UnknownHostException;
 
 import models.BootstrapState;
 
 
 public class BootstrapTalker extends Thread {
+    public boolean forwardServerMessageToClient;
     BootstrapState state;
     public String targetHostname;
     int port;
@@ -20,7 +19,7 @@ public class BootstrapTalker extends Thread {
 
     public boolean updateSuccessorNeighbors = false;
 
-    public boolean sendStoreRequest = false;
+    public boolean forwardClientMessageToServer = false;
 
 
 
@@ -67,13 +66,22 @@ public class BootstrapTalker extends Thread {
                     updateSuccessorNeighbors = false;
                 }
 
-                if(sendStoreRequest) {
+                if(forwardClientMessageToServer) {
                     String message = state.clientRequest;
                     System.out.println("Sending STORE_REQUEST to " + targetHostname + ": " + message);
                     byte[] messageBytes = message.getBytes();
                     outputStream.write(messageBytes);
                     outputStream.flush();
-                    sendStoreRequest = false;
+                    forwardClientMessageToServer = false;
+                }
+
+                if(forwardServerMessageToClient) {
+                    String message = state.messageToForward;
+                    System.out.println("Sending SERVICE message to " + targetHostname + ": " + message);
+                    byte[] messageBytes = message.getBytes();
+                    outputStream.write(messageBytes);
+                    outputStream.flush();
+                    forwardServerMessageToClient = false;
                 }
 
                 sleep(1);
